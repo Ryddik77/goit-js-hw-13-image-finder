@@ -1,34 +1,46 @@
-export default {
-    apiKey: '18667452-b6cf3b15ecb06490e1251bb0b',
-    searchQuery: '',
-    perPage: 12,
-    page: 1,
-    
-    fetchPhoto() {
-        const url = `https://pixabay.com/api/?q=${this.query}&image_type=photo&orientation=horizontal&per_page=${this.perPage}&key=${this.apiKey}&page=${this.page}`;
-        return fetch(url)
-            .then(res => {
-                this.incrementPage();
-                return res.json();
-            })
-            .catch(err => console.log(err));
-    },
+const BASE_URL = 'https://pixabay.com/api';
+const API_KEY = '18992166-123806360f211761da038f5eb';
 
-    resetPage() {
-        this.page = 1;
-    },
+export default class ImageApiService {
+  constructor() {
+    this.searchQuery = '';
+    this.page = 1;
+  }
 
-    incrementPage() {
-        this.page += 1;
-    },
+  async fetchImage() {
+    const responseUrl = await fetch(
+      `${BASE_URL}/?image_type=photo&orientation=horizontal&q=${this.searchQuery}&page=${this.page}&per_page=12&key=${API_KEY}`,
+    );
 
-    get query() {
-        return this.searchQuery.trim();
-    },
+    const { hits: images } = await responseUrl.json();
+    this.incrementPage();
 
-    set query(value) {
-        this.searchQuery = value;
-    },
+    return images;
+  }
+  // fetchImage() {
+  //   const url = `${BASE_URL}/?image_type=photo&orientation=horizontal&q=${this.searchQuery}&page=${this.page}&per_page=12&key=${API_KEY}`;
 
- 
-};
+  //   return fetch(url).then(response =>
+  //     response.json().then(({ hits }) => {
+  //       this.incrementPage();
+  //       return hits;
+  //     }),
+  //   );
+  // }
+
+  incrementPage() {
+    this.page += 1;
+  }
+
+  resetPage() {
+    this.page = 1;
+  }
+
+  get query() {
+    return this.searchQuery;
+  }
+
+  set query(newQuery) {
+    this.searchQuery = newQuery;
+  }
+}
